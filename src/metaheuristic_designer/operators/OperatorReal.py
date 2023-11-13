@@ -7,7 +7,7 @@ from copy import copy
 import enum
 from enum import Enum
 from ..utils import RAND_GEN
-
+from .calculus import gradient
 
 class RealOpMethods(Enum):
     ONE_POINT = enum.auto()
@@ -39,6 +39,7 @@ class RealOpMethods(Enum):
     DE_CTPBEST_1 = enum.auto()
     PSO = enum.auto()
     FIREFLY = enum.auto()
+    FINDIFF = enum.auto()
     RANDOM = enum.auto()
     RANDOM_MASK = enum.auto()
     DUMMY = enum.auto()
@@ -86,6 +87,7 @@ real_ops_map = {
     "de/current-to-pbest/1": RealOpMethods.DE_CTPBEST_1,
     "pso": RealOpMethods.PSO,
     "firefly": RealOpMethods.FIREFLY,
+    "finitediff": RealOpMethods.FINDIFF,
     "random": RealOpMethods.RANDOM,
     "randommask": RealOpMethods.RANDOM_MASK,
     "dummy": RealOpMethods.DUMMY,
@@ -250,6 +252,10 @@ class OperatorReal(Operator):
                 params["d"],
                 params["g"],
             )
+
+        elif self.method == RealOpMethods.FINDIFF:
+            grad = gradient(objfunc.objective, indiv.genotype)
+            new_indiv.genotype = indiv.genotype - params["F"] * grad
 
         elif self.method == RealOpMethods.RANDOM:
             new_indiv = initializer.generate_random(objfunc)

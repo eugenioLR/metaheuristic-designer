@@ -30,10 +30,11 @@ def run_algorithm(alg_name, memetic, save_state):
         "v_timer": 0.5,
     }
 
-    # objfunc = Sphere(30, "min")
-    # objfunc = Rastrigin(30, "min")
-    objfunc = Rosenbrock(30, "min")
+    objfunc = Sphere(30, "min")
+    #objfunc = Rastrigin(30, "min")
+    #objfunc = Rosenbrock(30, "min")
     # objfunc = Weierstrass(30, "min")
+    
     pop_initializer = UniformVectorInitializer(objfunc.vecsize, objfunc.low_lim, objfunc.up_lim, pop_size=100)
 
     parent_params = ParamScheduler("Linear", {"amount": 20})
@@ -67,6 +68,14 @@ def run_algorithm(alg_name, memetic, save_state):
     elif alg_name == "LocalSearch":
         pop_initializer.pop_size = 1
         search_strat = LocalSearch(pop_initializer, mutation_op, params={"iters": 20})
+    elif alg_name == "FinDiff":
+        pop_initializer.pop_size = 1
+        search_strat = HillClimb(
+            pop_initializer,
+            OperatorReal("FiniteDiff", {"F": 0.001}),
+            selection_op=SurvivorSelection("Nothing"),
+            name="Gradient descent (finite diff)"
+        )
     elif alg_name == "SA":
         pop_initializer.pop_size = 1
         search_strat = SA(pop_initializer, mutation_op, {"iter": 100, "temp_init": 1, "alpha": 0.997})
